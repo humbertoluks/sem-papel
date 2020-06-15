@@ -1,0 +1,13 @@
+{
+  "name": "example-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Humberto Luksevicius",
+  "license": "MIT",
+  "scripts": {
+    "start": "dotnet run -p ./src/Backend/Backend.csproj",
+    "migration": "cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations add ",
+    "remove-migration":"cd ./src/Repository/  && dotnet ef --startup-project ../Backend/Backend.csproj migrations remove",
+    "database-update":"cd ./src/Repository/  && dotnet ef  --startup-project ../Backend/Backend.csproj database update"
+  }
+}
