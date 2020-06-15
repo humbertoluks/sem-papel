@@ -17,7 +17,7 @@ namespace DI
             services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase(databaseName: "Database").EnableSensitiveDataLogging(), ServiceLifetime.Scoped);
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
-            services.AddTransient(typeof(IStudentRepository), typeof(StudentRepository));
+            services.AddTransient(typeof(IGuiaRepository), typeof(GuiaRepository));
         }
     }
 }

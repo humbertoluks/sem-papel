@@ -1,8 +1,6 @@
-using Domain.Notifications;
-
 namespace Domain.Models
 {
-    public class Entity: Notifiable
+    public class Entity
     {
         public int Id { get; set; }
     }
