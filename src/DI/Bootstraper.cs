@@ -14,7 +14,8 @@ namespace DI
         {
             services.AddSingleton<IConfiguration>(_ => configuration);
 
-            services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase(databaseName: "Database").EnableSensitiveDataLogging(), ServiceLifetime.Scoped);
+            //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase(databaseName: "Database").EnableSensitiveDataLogging(), ServiceLifetime.Scoped);
+            services.AddDbContext<DataContext>( opt => opt.UseSqlServer(connectionString: configuration.GetConnectionString("database")) );
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient(typeof(IGuiaRepository), typeof(GuiaRepository));

@@ -2,10 +2,9 @@ using System.Collections.Generic;
 
 namespace Domain.Models
 {
-    public class GuiaTipo: Entity
+    public class GuiaOrigem: Entity
     {
         public string Descricao { get; set; }
-        public int? Local { get; set; }
         public ICollection<Guia> Guias { get; set; }
     }
 }

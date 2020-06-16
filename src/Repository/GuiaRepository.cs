@@ -23,7 +23,12 @@ namespace Repository
     }
     public async Task<IEnumerable<Guia>> All()
     {
-      return await _context.Guias.AsNoTracking().ToListAsync();
+      return await _context.Guias
+        .Include(t => t.GuiaTipo)
+        .Include(s => s.GuiaStatus)
+        .Include(sc => sc.GuiaStatusCheckIns)
+        .AsNoTracking()
+        .ToListAsync();
     }
 
     public Task<Guia> GetByIdAsync(int id)

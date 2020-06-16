@@ -10,11 +10,15 @@ namespace Repository.Data
         public DbSet<Guia> Guias { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.HasDefaultSchema("AtendimentoSemPapel");
+            builder.HasDefaultSchema("ATENDIMENTO");
             builder.ApplyConfiguration(new GuiaMap());
-            
+            builder.ApplyConfiguration(new GuiaOrigemMap());
+            builder.ApplyConfiguration(new GuiaStatusCheckInsMap());
+            builder.ApplyConfiguration(new GuiaStatusMap());
+            builder.ApplyConfiguration(new GuiaTipoMap());
             //builder.Ignore<>();
-            //base.OnModelCreating(builder);
+            
+            base.OnModelCreating(builder);
         }
     }
 }
