@@ -46,7 +46,7 @@ namespace Repository.Maps
                 guia.Property(n => n.Numero)
                     .HasColumnName("GUIA_NUMERO")
                     .HasColumnType("varchar(50)")
-                    .IsRequired();
+                    .IsRequired(true);
                 
                 guia.Property(n => n.NumeroOperadora)
                     .HasColumnName("GUIA_NUMERO_OPERADORA")
@@ -71,7 +71,7 @@ namespace Repository.Maps
                 beneficiario.Property(b => b.Cartao).HasColumnName("GUIA_BENEFICIARIO_CARTAO")
                     .HasMaxLength(50)
                     .HasColumnType("varchar(50)")
-                    .IsRequired();
+                    .IsRequired(true);
             });
             
             builder.Property(g => g.StatusCheckInFK)

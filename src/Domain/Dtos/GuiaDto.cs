@@ -8,7 +8,8 @@ namespace Domain.Dtos
         public string IdUnidade { get; set; } 
         public string PushId { get; set; } 
         public string TokenId { get; set; } 
-        public string CarteirinhaBeneficiario { get; set; } 
+        public string BeneficiarioCartao { get; set; } 
+        public string Beneficiario { get; set; } 
         public decimal Valor { get; set; } 
         public DateTime Data { get; set; } 
         public string GuiaXML { get; set; } 
