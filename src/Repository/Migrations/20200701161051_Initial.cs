@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Repository.Migrations
 {
-    public partial class Initialmigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -72,19 +72,20 @@ namespace Repository.Migrations
                 schema: "ATENDIMENTO",
                 columns: table => new
                 {
-                    GUIA_ID = table.Column<decimal>(type: "numeric(18,0)", nullable: false),
-                    LOTE_ID = table.Column<decimal>(type: "numeric(18,0)", nullable: true),
-                    PRESTADOR_ID = table.Column<string>(type: "varchar(50)", nullable: false),
+                    GUIA_ID = table.Column<decimal>(type: "decimal(18,0)", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LOTE_ID = table.Column<decimal>(type: "decimal(18,0)", nullable: true),
+                    PRESTADOR_ID = table.Column<string>(type: "varchar(50)", nullable: true),
                     PRESTADOR_LOGIN_ID = table.Column<int>(nullable: true),
                     PRESTADOR_UNIDADE_ID = table.Column<string>(type: "varchar(50)", nullable: true),
                     GUIA_TOKEN = table.Column<string>(type: "varchar(50)", nullable: true),
                     GUIA_BENEFICIARIO_TOKEN = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true),
-                    GUIA_NUMERO = table.Column<string>(type: "varchar(50)", nullable: false),
-                    GUIA_NUMERO_OPERADORA = table.Column<string>(type: "varchar(50)", nullable: false),
-                    GUIA_BENEFICIARIO_CARTAO = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    GUIA_BENEFICIARIO = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    GUIA_NUMERO = table.Column<string>(type: "varchar(50)", nullable: true),
+                    GUIA_NUMERO_OPERADORA = table.Column<string>(type: "varchar(50)", nullable: true),
+                    GUIA_BENEFICIARIO_CARTAO = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
+                    GUIA_BENEFICIARIO = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
                     GUIA_VALOR = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    GUIA_DATA = table.Column<DateTime>(type: "date", nullable: false),
+                    GUIA_DATA = table.Column<DateTime>(type: "date", nullable: false, defaultValueSql: "getdate()"),
                     GUIA_XML = table.Column<string>(type: "varchar(max)", nullable: true),
                     GUIA_DELETADA = table.Column<bool>(nullable: false),
                     GUIA_ORIGEM_ID = table.Column<int>(nullable: false),

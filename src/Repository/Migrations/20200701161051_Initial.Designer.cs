@@ -10,8 +10,8 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200616204211_Initial migration")]
-    partial class Initialmigration
+    [Migration("20200701161051_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,25 +27,30 @@ namespace Repository.Migrations
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("GUIA_ID")
-                        .HasColumnType("numeric(18,0)");
+                        .HasColumnType("decimal(18,0)")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("Data")
+                        .ValueGeneratedOnAdd()
                         .HasColumnName("GUIA_DATA")
-                        .HasColumnType("date");
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<bool>("Deletada")
                         .HasColumnName("GUIA_DELETADA")
                         .HasColumnType("bit");
 
-                    b.Property<int>("GuiaOrigemId")
+                    b.Property<int>("GuiaOrigemFK")
                         .HasColumnName("GUIA_ORIGEM_ID")
                         .HasColumnType("int");
 
-                    b.Property<int>("GuiaStatusId")
+                    b.Property<int>("GuiaStatusFK")
                         .HasColumnName("GUIA_STATUS_ID")
                         .HasColumnType("int");
 
-                    b.Property<int>("GuiaTipoId")
+                    b.Property<int>("GuiaTipoFK")
                         .HasColumnName("GUIA_TIPO_ID")
                         .HasColumnType("int");
 
@@ -55,13 +60,13 @@ namespace Repository.Migrations
 
                     b.Property<decimal?>("LoteId")
                         .HasColumnName("LOTE_ID")
-                        .HasColumnType("numeric(18,0)");
+                        .HasColumnType("decimal(18,0)");
 
                     b.Property<string>("PushId")
                         .HasColumnName("GUIA_TOKEN")
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("StatusCheckInId")
+                    b.Property<int>("StatusCheckInFK")
                         .HasColumnName("GUIA_BENEFICIARIO_CHECKIN_STATUS_ID")
                         .HasColumnType("int");
 
@@ -76,13 +81,13 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GuiaOrigemId");
+                    b.HasIndex("GuiaOrigemFK");
 
-                    b.HasIndex("GuiaStatusId");
+                    b.HasIndex("GuiaStatusFK");
 
-                    b.HasIndex("GuiaTipoId");
+                    b.HasIndex("GuiaTipoFK");
 
-                    b.HasIndex("StatusCheckInId");
+                    b.HasIndex("StatusCheckInFK");
 
                     b.ToTable("GUIA");
                 });
@@ -254,25 +259,25 @@ namespace Repository.Migrations
                 {
                     b.HasOne("Domain.Models.GuiaOrigem", "GuiaOrigem")
                         .WithMany("Guias")
-                        .HasForeignKey("GuiaOrigemId")
+                        .HasForeignKey("GuiaOrigemFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Models.GuiaStatus", "GuiaStatus")
                         .WithMany("Guias")
-                        .HasForeignKey("GuiaStatusId")
+                        .HasForeignKey("GuiaStatusFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Models.GuiaTipo", "GuiaTipo")
                         .WithMany("Guias")
-                        .HasForeignKey("GuiaTipoId")
+                        .HasForeignKey("GuiaTipoFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Models.GuiaStatusCheckIns", "GuiaStatusCheckIns")
                         .WithMany("Guias")
-                        .HasForeignKey("StatusCheckInId")
+                        .HasForeignKey("StatusCheckInFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -280,7 +285,8 @@ namespace Repository.Migrations
                         {
                             b1.Property<decimal>("GuiaId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("numeric(18,0)");
+                                .HasColumnType("decimal(18,0)")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<string>("Cartao")
                                 .IsRequired()
@@ -306,7 +312,8 @@ namespace Repository.Migrations
                         {
                             b1.Property<decimal>("GuiaId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("numeric(18,0)");
+                                .HasColumnType("decimal(18,0)")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<string>("Numero")
                                 .IsRequired()
@@ -330,14 +337,15 @@ namespace Repository.Migrations
                         {
                             b1.Property<decimal>("GuiaId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("numeric(18,0)");
+                                .HasColumnType("decimal(18,0)")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Id")
+                            b1.Property<string>("Codigo")
                                 .IsRequired()
                                 .HasColumnName("PRESTADOR_ID")
                                 .HasColumnType("varchar(50)");
 
-                            b1.Property<int>("LoginId")
+                            b1.Property<int?>("LoginId")
                                 .HasColumnName("PRESTADOR_LOGIN_ID")
                                 .HasColumnType("int");
 
@@ -353,7 +361,8 @@ namespace Repository.Migrations
                         {
                             b1.Property<decimal>("GuiaId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("numeric(18,0)");
+                                .HasColumnType("decimal(18,0)")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<string>("Id")
                                 .HasColumnName("PRESTADOR_UNIDADE_ID")

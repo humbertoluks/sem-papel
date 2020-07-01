@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Domain.Models;
 
 namespace Repository.Maps
@@ -14,20 +15,22 @@ namespace Repository.Maps
             
             builder.Property(g => g.Id)
                 .HasColumnName("GUIA_ID")
-                .HasColumnType("numeric(18,0)");
+                .HasColumnType("decimal(18,0)")
+                .UseIdentityColumn();
             
             builder.Property(g => g.LoteId)
                 .HasColumnName("LOTE_ID")
-                .HasColumnType("numeric(18,0)");
+                .HasColumnType("decimal(18,0)")
+                .IsRequired(false);
 
             builder.OwnsOne(g => g.Prestador, prestador => { 
-                prestador.Property(p => p.Id)
-                    .IsRequired()
+                prestador.Property(p => p.Codigo)
                     .HasColumnName("PRESTADOR_ID")
-                    .HasColumnType("varchar(50)"); 
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
                 prestador.Property(p => p.LoginId)
-                    .IsRequired(false)
-                    .HasColumnName("PRESTADOR_LOGIN_ID");
+                    .HasColumnName("PRESTADOR_LOGIN_ID")
+                    .IsRequired(false);
             });
 
             builder.OwnsOne(g => g.Unidade)
@@ -41,23 +44,23 @@ namespace Repository.Maps
             
             builder.OwnsOne(g => g.GuiaNumero, guia => {
                 guia.Property(n => n.Numero)
-                    .IsRequired()
                     .HasColumnName("GUIA_NUMERO")
-                    .HasColumnType("varchar(50)");
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
                 
                 guia.Property(n => n.NumeroOperadora)
-                    .IsRequired()
                     .HasColumnName("GUIA_NUMERO_OPERADORA")
-                    .HasColumnType("varchar(50)");
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
             });
             
             builder.Property(g => g.GuiaTipoFK)
-                .IsRequired()
-                .HasColumnName("GUIA_TIPO_ID");
+                .HasColumnName("GUIA_TIPO_ID")
+                .IsRequired();
             
             builder.Property(g => g.GuiaStatusFK)
-                .IsRequired()
-                .HasColumnName("GUIA_STATUS_ID");
+                .HasColumnName("GUIA_STATUS_ID")
+                .IsRequired();
             
             builder.OwnsOne (g => g.Beneficiario, beneficiario => {
                 beneficiario.Property(b => b.Nome)
@@ -72,26 +75,27 @@ namespace Repository.Maps
             });
             
             builder.Property(g => g.StatusCheckInFK)
-                .IsRequired()
-                .HasColumnName("GUIA_BENEFICIARIO_CHECKIN_STATUS_ID");
+                .HasColumnName("GUIA_BENEFICIARIO_CHECKIN_STATUS_ID")
+                .IsRequired();
             
             builder.Property(g => g.Valor)
-                .IsRequired()
                 .HasColumnName("GUIA_VALOR")
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
             
             builder.Property(g => g.Data)
-                .IsRequired()
                 .HasColumnName("GUIA_DATA")
-                .HasColumnType("date");
+                .HasColumnType("date")
+                .HasDefaultValueSql("getdate()")
+                .IsRequired();
             
             builder.Property(g => g.GuiaXML)
                 .HasColumnName("GUIA_XML")
                 .HasColumnType("varchar(max)");
             
             builder.Property(g => g.Deletada)
-                .IsRequired()
-                .HasColumnName("GUIA_DELETADA");
+                .HasColumnName("GUIA_DELETADA")
+                .IsRequired();
             
             builder.Property(g => g.GuiaOrigemFK)
                 .IsRequired()
@@ -105,7 +109,6 @@ namespace Repository.Maps
             /*
              * Foreign Keys
              */
-            
             builder.HasOne(a => a.GuiaTipo)
                 .WithMany (g => g.Guias)
                 .HasForeignKey(k => k.GuiaTipoFK);

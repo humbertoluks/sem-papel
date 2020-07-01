@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "dotnet run -p ./src/Backend/Backend.csproj",
+    "watch": "dotnet watch -p ./src/Backend/Backend.csproj run",
     "migration": "cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations add ",
     "remove-migration":"cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations remove",
     "database-update":"cd ./src/Repository/ && dotnet ef  --startup-project ../Backend/Backend.csproj database update"

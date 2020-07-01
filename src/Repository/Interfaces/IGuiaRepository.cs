@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Models;
-using Repository.Interfaces;
 
 namespace Repository.Interfaces
 {
-    public interface IGuiaRepository:IRepository<Guia, int>
+    public interface IGuiaRepository
     {
         Task<IEnumerable<Guia>> All();
 
-        void Delete(int id);
+        void Delete(decimal id);
+        Task<Guia> GetByIdAsync(decimal id);
+        void Save(Guia entity);
     }
 }

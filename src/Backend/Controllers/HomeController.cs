@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Backend.Services;
-using Repository;
 using Domain.Models.Account;
+using Repository;
 
 namespace Backend.Controllers
 {

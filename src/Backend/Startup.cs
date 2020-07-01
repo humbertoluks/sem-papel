@@ -1,16 +1,19 @@
-using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using AutoMapper;
-using DI;
-using Serilog;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System.Text;
+
 using Backend.Filters;
+using Backend.Helpers;
+using DI;
+
 
 namespace Backend
 {
@@ -56,6 +59,8 @@ namespace Backend
             });
 
             services.AddAutoMapper();
+
+            //services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)

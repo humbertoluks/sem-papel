@@ -5,6 +5,6 @@ namespace Domain.Models
     public class GuiaStatusCheckIns: Entity
     {
         public string Descricao { get; set; }
-        public ICollection<Guia> Guias { get; set; }
+        public IEnumerable<Guia> Guias { get; set; }
   }
 }

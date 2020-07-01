@@ -2,14 +2,14 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using System;
 using System.Threading.Tasks;
 
+using Domain.Dtos;
 using Domain.Models;
 using Repository.Interfaces;
-using Microsoft.Extensions.Logging;
-using System;
-using Serilog;
-using System.Threading;
 
 namespace Backend.Controllers
 {
@@ -17,6 +17,7 @@ namespace Backend.Controllers
     public class GuiaController : ControllerBase
     {
         public IDiagnosticContext _diagnosticContext { get; }
+        
         private ILogger<GuiaController> _logger;
         private readonly IMapper _mapper;
 
@@ -37,14 +38,16 @@ namespace Backend.Controllers
         [HttpPost]
         [Route("v1/guia")]
         [Authorize]
-        public async Task<IActionResult> Post([FromBody]Guia guia)
+        public async Task<IActionResult> Post([FromBody]GuiaDto guiaDto)
         {
             try
             {
+                var guia = _mapper.Map<GuiaDto, Guia>(guiaDto);
+
                 _GuiaRepository.Save(guia);
                 await _uow.CommitAsync();
 
-                return Created($"/v1/guia/{guia.Id}", guia);
+                return Created($"/v1/guia/{guia.Id}", null);
             }
             catch (System.Exception ex)
             {
@@ -54,9 +57,9 @@ namespace Backend.Controllers
         }
 
         [HttpDelete]
-        [Route("v1/guia/{IdGuiaExterno:int}")]
+        [Route("v1/guia/{GuiaExternaId:int}")]
         [Authorize]
-        public async Task<IActionResult> Delete(int id){
+        public async Task<IActionResult> Delete(decimal id){
             try
             {
                 _GuiaRepository.Delete(id);
@@ -73,13 +76,16 @@ namespace Backend.Controllers
 
         [HttpGet]
         [Route("v1/guia")]
-        //[Authorize (AuthenticationSchemes = "Bearer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<IActionResult> Get()
         {
             try
             {
                 var guias = await _GuiaRepository.All();
+                if (guias == null)
+                    return NotFound();
 
                 return Ok(guias);
             }

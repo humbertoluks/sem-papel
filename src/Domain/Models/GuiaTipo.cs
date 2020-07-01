@@ -6,6 +6,6 @@ namespace Domain.Models
     {
         public string Descricao { get; set; }
         public int? Local { get; set; }
-        public ICollection<Guia> Guias { get; set; }
+        public IEnumerable<Guia> Guias { get; set; }
     }
 }

@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using Repository.Interfaces;
 
@@ -14,7 +15,7 @@ namespace Repository
     {
       _context = context; 
     }
-    public async void Delete(int id)
+    public async void Delete(decimal id)
     {
       var guia = await _context.Guias.FirstOrDefaultAsync(g => g.Id == id);
 
@@ -31,9 +32,14 @@ namespace Repository
         .ToListAsync();
     }
 
-    public Task<Guia> GetByIdAsync(int id)
+    public Task<Guia> GetByIdAsync(decimal id)
     {
-      return _context.Guias.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+      return _context.Guias
+        .Include(t => t.GuiaTipo)
+        .Include(s => s.GuiaStatus)
+        .Include(sc => sc.GuiaStatusCheckIns)
+        .AsNoTracking()
+        .FirstOrDefaultAsync(g => g.Id == id);
     }
 
     public void Save(Guia entity)

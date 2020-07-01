@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using Domain.ValueObjects;
 
 namespace Domain.Models
 {
-    public class Guia: Entity
+    public class Guia: EntityGuia
     {
         public int? LoteId { get; set; }
         public Prestador Prestador { get; set; } 
@@ -18,7 +17,7 @@ namespace Domain.Models
         public string GuiaXML { get; set; } 
         public bool Deletada { get; set; }
         
-        // Relacionamentos 1 - 1
+        //Relacionamentos 1 - 1
         public int GuiaOrigemFK { get; set; }
         public GuiaOrigem GuiaOrigem { get; set; }
         public int GuiaStatusFK { get; set; }
@@ -27,5 +26,6 @@ namespace Domain.Models
         public GuiaTipo GuiaTipo { get; set; } 
         public int StatusCheckInFK { get; set; }
         public GuiaStatusCheckIns GuiaStatusCheckIns { get; set; } 
+        //public int GuiaExternaId { get; set; } 
     }
 }

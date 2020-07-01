@@ -1,8 +1,6 @@
-using Domain.Models;
-
 namespace Domain.ValueObjects
 {
-    public class GuiaNumero
+    public class GuiaNumero: ValueObject
     {
         public string Numero { get; set; }
         public string NumeroOperadora { get; set; }
