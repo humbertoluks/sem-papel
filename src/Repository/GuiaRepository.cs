@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Domain.Models;
@@ -41,7 +43,6 @@ namespace Repository
         .AsNoTracking()
         .FirstOrDefaultAsync(g => g.Id == id);
     }
-
     public void Save(Guia entity)
     {
       _context.Guias.Add(entity);

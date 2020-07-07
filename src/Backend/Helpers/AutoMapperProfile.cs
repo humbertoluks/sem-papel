@@ -15,7 +15,7 @@ namespace Backend.Helpers
             .ForPath(dest => dest.Prestador.Codigo, opts => opts.MapFrom(src => src.CodigoPrestador))
             .ForMember(dest => dest.Unidade, opts => opts.MapFrom(src => new Unidade()))
             .ForPath(dest => dest.Unidade.Id, opts => opts.MapFrom(src => src.IdUnidade))
-            .ForMember(dest => dest.GuiaNumero, opts => opts.MapFrom(src => new GuiaNumero()))
+            .ForMember(dest => dest.GuiaNumero, opts => opts.MapFrom(src => new NumeroGuia()))
             .ForMember(dest => dest.PushId, opts => opts.MapFrom(src => src.PushId))
             .ForMember(dest => dest.TokenId, opts => opts.MapFrom(src => src.TokenId))
             .ForMember(dest => dest.Beneficiario, opts => opts.MapFrom(src => new Beneficiario()))

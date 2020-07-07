@@ -11,7 +11,6 @@ using Serilog;
 using System.Text;
 
 using Backend.Filters;
-using Backend.Helpers;
 using DI;
 
 
@@ -23,7 +22,6 @@ namespace Backend
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {

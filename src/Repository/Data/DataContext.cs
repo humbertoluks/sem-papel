@@ -8,6 +8,7 @@ namespace Repository.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<Guia> Guias { get; set; }
+        public DbSet<GuiaNumero> GuiaNumeros { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasDefaultSchema("ATENDIMENTO");
@@ -16,6 +17,7 @@ namespace Repository.Data
             builder.ApplyConfiguration(new GuiaStatusCheckInsMap());
             builder.ApplyConfiguration(new GuiaStatusMap());
             builder.ApplyConfiguration(new GuiaTipoMap());
+            builder.ApplyConfiguration(new GuiaNumeroMap());
             //builder.Ignore<>();
             
             base.OnModelCreating(builder);

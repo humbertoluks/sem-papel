@@ -17,7 +17,8 @@ namespace Repository.Maps
 
             builder.HasData(
                 new GuiaOrigem {Id = 1, Descricao = "URL"},
-                new GuiaOrigem {Id = 2, Descricao = "PORTAL"}
+                new GuiaOrigem {Id = 2, Descricao = "PORTAL"},
+                new GuiaOrigem {Id = 3, Descricao = "TELEMEDICINA"}
             );
         }
     }

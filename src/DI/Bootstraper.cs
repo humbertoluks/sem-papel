@@ -1,10 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 using Repository;
 using Repository.Interfaces;
 using Repository.Data;
-using Microsoft.EntityFrameworkCore;
+using Service;
+using Service.Interfaces;
 
 namespace DI
 {
@@ -19,6 +21,11 @@ namespace DI
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient(typeof(IGuiaRepository), typeof(GuiaRepository));
+            services.AddTransient(typeof(IGuiaNumeroRepository), typeof(GuiaNumeroRepository));
+
+            services.AddTransient(typeof(IGuiaService), typeof(GuiaService));
+            services.AddTransient(typeof(IAssociadoService), typeof(AssociadoService));
+            services.AddTransient(typeof(IPrestadorService), typeof(PrestadorService));
         }
     }
 }

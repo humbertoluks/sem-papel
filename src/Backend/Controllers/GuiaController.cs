@@ -5,11 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using System.Xml;
 
 using Domain.Dtos;
 using Domain.Models;
 using Repository.Interfaces;
+using Service.Interfaces;
 
 namespace Backend.Controllers
 {
@@ -17,20 +22,24 @@ namespace Backend.Controllers
     public class GuiaController : ControllerBase
     {
         public IDiagnosticContext _diagnosticContext { get; }
-        
         private ILogger<GuiaController> _logger;
         private readonly IMapper _mapper;
-
         private readonly IGuiaRepository _GuiaRepository;
+        private readonly IGuiaNumeroRepository _GuiaNumeroRepository;
+        private readonly IGuiaService _GuiaService;
         private readonly IUnitOfWork _uow;
 
-        public GuiaController(ILogger<GuiaController> logger, IDiagnosticContext diagnosticContext, [FromServices] IGuiaRepository GuiaRepository, 
+        public GuiaController(ILogger<GuiaController> logger, IDiagnosticContext diagnosticContext, 
+            [FromServices] IGuiaRepository GuiaRepository, [FromServices] IGuiaNumeroRepository GuiaNumeroRepository,
+            [FromServices] IGuiaService GuiaService,
             [FromServices] IUnitOfWork uow,
             IMapper mapper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _diagnosticContext = diagnosticContext ?? throw new ArgumentNullException(nameof(diagnosticContext));
             _GuiaRepository = GuiaRepository;
+            _GuiaNumeroRepository =GuiaNumeroRepository;
+            _GuiaService = GuiaService;
             _uow = uow;
             _mapper = mapper;
         }
@@ -44,6 +53,17 @@ namespace Backend.Controllers
             {
                 var guia = _mapper.Map<GuiaDto, Guia>(guiaDto);
 
+                // Complemento da Guia
+                var guiaNumero = await _GuiaNumeroRepository.GetLastGuiaIdAsync(guia.Prestador.Codigo);
+                guia.GuiaNumero.Numero = guiaNumero.ToString();
+                guia.GuiaNumero.NumeroOperadora = guia.GuiaNumero.NumeroOperadora ?? "";
+
+                guia.GuiaXML = _GuiaService.GenerateXMLGuia(guia.Prestador.Codigo, guia.Beneficiario.Cartao, 
+                    guia.GuiaNumero.Numero, Convert.ToInt32(guia.Unidade.Id), guiaDto.ProfissionalUFCRM, 
+                    Convert.ToInt32(guiaDto.ProfissionalCRM), guiaDto.Procedimento, guia.Valor);
+
+                _logger.LogDebug(guia.GuiaXML.ToString());
+
                 _GuiaRepository.Save(guia);
                 await _uow.CommitAsync();
 
@@ -52,7 +72,8 @@ namespace Backend.Controllers
             catch (System.Exception ex)
             {
                 _uow.Rollback();
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Falha no banco de dados, detalhes : {ex.Message}");
+                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Falha no banco de dados, detalhes : {ex.Message}");
             }
         }
 
@@ -70,7 +91,8 @@ namespace Backend.Controllers
             catch (System.Exception ex)
             {
                 _uow.Rollback();
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Falha no banco de dados, detalhes : {ex.Message}");
+                return this.StatusCode(StatusCodes.Status500InternalServerError
+                    , $"Falha no banco de dados, detalhes : {ex.Message}");
             }
         }
 
@@ -91,7 +113,8 @@ namespace Backend.Controllers
             }
             catch (System.Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Falha no banco de dados, detalhes : {ex.Message}");
+                return this.StatusCode(StatusCodes.Status500InternalServerError
+                    , $"Falha no banco de dados, detalhes : {ex.Message}");
             }
         }
 
@@ -108,7 +131,8 @@ namespace Backend.Controllers
             }
             catch (System.Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Falha no banco de dados, detalhes : {ex.Message}");
+                return this.StatusCode(StatusCodes.Status500InternalServerError
+                    , $"Falha no banco de dados, detalhes : {ex.Message}");
             }
         }
     }

@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "dotnet run -p ./src/Backend/Backend.csproj",
+    "publish-project": "cd ./src/Backend/ && dotnet publish -o D:/temp/publish/Sem-Papel/Backend",
     "watch": "dotnet watch -p ./src/Backend/Backend.csproj run",
     "migration": "cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations add ",
     "remove-migration":"cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations remove",
