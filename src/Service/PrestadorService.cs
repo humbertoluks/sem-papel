@@ -7,7 +7,7 @@ namespace Service
 {
     public class PrestadorService: IPrestadorService
     {
-        private static RestClient client = new RestClient("http://omtseg-prod.omintseguros.com.br/MW.WebApi.SemPapel");
+        private static RestClient client = new RestClient("http://omtseg-homolog.omintseguros.com.br/MW.WebApi.Ext");
         public PrestadorService(){ }
         private string login()
         {
@@ -39,7 +39,7 @@ namespace Service
             return (string)prestadorObj["prestadorNome"];
         }
 
-        public string PrestadorMedico(string pUfCrm, int pNrCrm)
+        public string PrestadorMedico(string codigoPrestador, string ufCrm, int nrCrm, string nomeMedico)
         {
             var token = login();
             RestRequest request = new RestRequest($"/ContratoPrestador/GetPrestadorMedicos", Method.GET);
@@ -48,10 +48,10 @@ namespace Service
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Authorization", string.Format("Bearer {0}", token));
 
-            request.AddParameter("cdPrestador", null, ParameterType.QueryString);
-            request.AddParameter("ufPrestador", pUfCrm, ParameterType.QueryString);
-            request.AddParameter("crmMedico", pNrCrm, ParameterType.QueryString);
-            request.AddParameter("nomeMedico", null, ParameterType.QueryString);
+            request.AddParameter("cdPrestador", codigoPrestador, ParameterType.QueryString);
+            request.AddParameter("ufPrestador", ufCrm, ParameterType.QueryString);
+            request.AddParameter("crmMedico", nrCrm, ParameterType.QueryString);
+            request.AddParameter("nomeMedico", nomeMedico, ParameterType.QueryString);
 
             IRestResponse<string> response = client.Execute<string>(request);
             if(response.StatusCode != System.Net.HttpStatusCode.OK) return "";

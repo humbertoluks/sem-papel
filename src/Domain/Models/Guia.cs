@@ -7,6 +7,10 @@ namespace Domain.Models
     [Serializable]
     public class Guia: EntityGuia
     {
+        public Guia()
+        {
+            Data = DateTime.Now.Date;
+        }
         [XmlIgnore] public int? LoteId { get; set; }
         public Prestador Prestador { get; set; } 
         public Unidade Unidade { get; set; } 

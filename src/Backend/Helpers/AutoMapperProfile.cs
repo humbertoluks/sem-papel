@@ -16,19 +16,19 @@ namespace Backend.Helpers
             .ForMember(dest => dest.Unidade, opts => opts.MapFrom(src => new Unidade()))
             .ForPath(dest => dest.Unidade.Id, opts => opts.MapFrom(src => src.IdUnidade))
             .ForMember(dest => dest.GuiaNumero, opts => opts.MapFrom(src => new NumeroGuia()))
-            .ForMember(dest => dest.PushId, opts => opts.MapFrom(src => src.PushId))
-            .ForMember(dest => dest.TokenId, opts => opts.MapFrom(src => src.TokenId))
+            // .ForMember(dest => dest.PushId, opts => opts.MapFrom(src => src.PushId))
+            // .ForMember(dest => dest.TokenId, opts => opts.MapFrom(src => src.TokenId))
             .ForMember(dest => dest.Beneficiario, opts => opts.MapFrom(src => new Beneficiario()))
             .ForPath(dest => dest.Beneficiario.Cartao, opts => opts.MapFrom(src => src.BeneficiarioCartao))
             .ForMember(dest => dest.Beneficiario, opts => opts.MapFrom(src => new Beneficiario()))
-            .ForPath(dest => dest.Beneficiario.Nome, opts => opts.MapFrom(src => src.Beneficiario))
-            .ForMember(dest => dest.GuiaXML, opts => opts.MapFrom(src => src.GuiaXML))
-            .ForMember(dest => dest.Valor, opts => opts.MapFrom(src => src.Valor))
-            .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data))
-            .ForMember(dest => dest.GuiaOrigemFK, opts => opts.MapFrom(src => src.GuiaOrigemId))
-            .ForMember(dest => dest.GuiaStatusFK, opts => opts.MapFrom(src => src.GuiaStatusId))
-            .ForMember(dest => dest.GuiaTipoFK, opts => opts.MapFrom(src => src.GuiaTipoId))
-            .ForMember(dest => dest.StatusCheckInFK, opts => opts.MapFrom(src => src.StatusCheckInId));
+            // .ForPath(dest => dest.Beneficiario.Nome, opts => opts.MapFrom(src => src.Beneficiario))
+            // .ForMember(dest => dest.GuiaXML, opts => opts.MapFrom(src => src.GuiaXML))
+            .ForMember(dest => dest.Valor, opts => opts.MapFrom(src => src.Valor));
+            // .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data))
+            // .ForMember(dest => dest.GuiaOrigemFK, opts => opts.MapFrom(src => src.GuiaOrigemId))
+            // .ForMember(dest => dest.GuiaStatusFK, opts => opts.MapFrom(src => src.GuiaStatusId))
+            // .ForMember(dest => dest.GuiaTipoFK, opts => opts.MapFrom(src => src.GuiaTipoId))
+            // .ForMember(dest => dest.StatusCheckInFK, opts => opts.MapFrom(src => src.StatusCheckInId));
         }
     }
 }

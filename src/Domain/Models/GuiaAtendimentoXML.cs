@@ -2,7 +2,7 @@ using System;
 
 namespace Domain.Models
 {
-    public class GuiaAtendimentoXML
+    public class guiaAtendimentoObj
     {
         public int lotId { get; set; }
         public string providerId { get; set; }

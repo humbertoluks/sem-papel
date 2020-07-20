@@ -5,16 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
-using System.Xml;
 
 using Domain.Dtos;
 using Domain.Models;
 using Repository.Interfaces;
 using Service.Interfaces;
+using Domain.Enumerations;
 
 namespace Backend.Controllers
 {
@@ -27,11 +24,16 @@ namespace Backend.Controllers
         private readonly IGuiaRepository _GuiaRepository;
         private readonly IGuiaNumeroRepository _GuiaNumeroRepository;
         private readonly IGuiaService _GuiaService;
+        private readonly IPrestadorService _PrestadorService;
+        private readonly IAssociadoService _AssociadoService ;
         private readonly IUnitOfWork _uow;
 
         public GuiaController(ILogger<GuiaController> logger, IDiagnosticContext diagnosticContext, 
-            [FromServices] IGuiaRepository GuiaRepository, [FromServices] IGuiaNumeroRepository GuiaNumeroRepository,
+            [FromServices] IGuiaRepository GuiaRepository, 
+            [FromServices] IGuiaNumeroRepository GuiaNumeroRepository,
             [FromServices] IGuiaService GuiaService,
+            [FromServices] IPrestadorService PrestadorService,
+            [FromServices] IAssociadoService AssociadoService,
             [FromServices] IUnitOfWork uow,
             IMapper mapper)
         {
@@ -40,6 +42,8 @@ namespace Backend.Controllers
             _GuiaRepository = GuiaRepository;
             _GuiaNumeroRepository =GuiaNumeroRepository;
             _GuiaService = GuiaService;
+            _PrestadorService = PrestadorService;
+            _AssociadoService = AssociadoService;
             _uow = uow;
             _mapper = mapper;
         }
@@ -52,21 +56,35 @@ namespace Backend.Controllers
             try
             {
                 var guia = _mapper.Map<GuiaDto, Guia>(guiaDto);
-
+                var prestador = _PrestadorService.PrestadorDescription(guia.Prestador.Codigo);
+                var guidePerformerCodeType = PerformerCodeType.codigoPrestadorNaOperadora.ToString();
                 // Complemento da Guia
                 var guiaNumero = await _GuiaNumeroRepository.GetLastGuiaIdAsync(guia.Prestador.Codigo);
                 guia.GuiaNumero.Numero = guiaNumero.ToString();
-                guia.GuiaNumero.NumeroOperadora = guia.GuiaNumero.NumeroOperadora ?? "";
+                guia.GuiaNumero.NumeroOperadora = "";
+                               
+                guia.Beneficiario.Nome = _AssociadoService.SeachAssociado(guia.Beneficiario.Cartao);
+                guia.PushId = "";
+                guia.TokenId = "";
 
-                guia.GuiaXML = _GuiaService.GenerateXMLGuia(guia.Prestador.Codigo, guia.Beneficiario.Cartao, 
-                    guia.GuiaNumero.Numero, Convert.ToInt32(guia.Unidade.Id), guiaDto.ProfissionalUFCRM, 
-                    Convert.ToInt32(guiaDto.ProfissionalCRM), guiaDto.Procedimento, guia.Valor);
+                guia.GuiaOrigemFK = (int)SourceInterface.TELEMEDICINA;
+                guia.StatusCheckInFK = (int)StatusCheckIns.Valido;
+                guia.GuiaTipoFK = (int)TypeGuia.Consulta;
+                guia.GuiaStatusFK = (int)StatusGuia.Aberta;
 
-                _logger.LogDebug(guia.GuiaXML.ToString());
+                string profissional = _PrestadorService.PrestadorMedico(guia.Prestador.Codigo, 
+                    guiaDto.ProfissionalUFCRM,Convert.ToInt32(guiaDto.ProfissionalCRM), null);
+                
+                guia.GuiaXML = _GuiaService.GenerateXMLGuia(guia, prestador,
+                    PerformerCodeType.codigoPrestadorNaOperadora, guiaDto.ProfissionalUFCRM, 
+                    Convert.ToInt32(guiaDto.ProfissionalCRM), profissional, guiaDto.Procedimento);
+                string textGuia = guia.GuiaXML.ToString();
+
+                _logger.LogInformation(textGuia);
 
                 _GuiaRepository.Save(guia);
                 await _uow.CommitAsync();
-
+ 
                 return Created($"/v1/guia/{guia.Id}", null);
             }
             catch (System.Exception ex)
