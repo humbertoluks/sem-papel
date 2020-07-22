@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 
 using Domain.Dtos;
 using Domain.Models;
+using Domain.Helpers;
 using Repository.Interfaces;
 using Service.Interfaces;
-using Domain.Enumerations;
+using Domain.Dtos.Push;
+using Domain.ValueObjects;
 
 namespace Backend.Controllers
 {
@@ -26,6 +28,7 @@ namespace Backend.Controllers
         private readonly IGuiaService _GuiaService;
         private readonly IPrestadorService _PrestadorService;
         private readonly IAssociadoService _AssociadoService ;
+        private readonly IPushService _PushService;
         private readonly IUnitOfWork _uow;
 
         public GuiaController(ILogger<GuiaController> logger, IDiagnosticContext diagnosticContext, 
@@ -34,6 +37,7 @@ namespace Backend.Controllers
             [FromServices] IGuiaService GuiaService,
             [FromServices] IPrestadorService PrestadorService,
             [FromServices] IAssociadoService AssociadoService,
+            [FromServices] IPushService PushService,
             [FromServices] IUnitOfWork uow,
             IMapper mapper)
         {
@@ -44,6 +48,7 @@ namespace Backend.Controllers
             _GuiaService = GuiaService;
             _PrestadorService = PrestadorService;
             _AssociadoService = AssociadoService;
+            _PushService = PushService;
             _uow = uow;
             _mapper = mapper;
         }
@@ -57,26 +62,43 @@ namespace Backend.Controllers
             {
                 var guia = _mapper.Map<GuiaDto, Guia>(guiaDto);
                 var prestador = _PrestadorService.PrestadorDescription(guia.Prestador.Codigo);
-                var guidePerformerCodeType = PerformerCodeType.codigoPrestadorNaOperadora.ToString();
+                var guidePerformerCodeType = Enums.PerformerCodeType.codigoPrestadorNaOperadora;
                 // Complemento da Guia
                 var guiaNumero = await _GuiaNumeroRepository.GetLastGuiaIdAsync(guia.Prestador.Codigo);
                 guia.GuiaNumero.Numero = guiaNumero.ToString();
                 guia.GuiaNumero.NumeroOperadora = "";
-                               
+ 
                 guia.Beneficiario.Nome = _AssociadoService.SeachAssociado(guia.Beneficiario.Cartao);
-                guia.PushId = "";
+
+                PushRequest request = new PushRequest {
+                    Associado = new IntAssociado {
+                        CodAcompanhante = "",
+                        CodAssociado = guia.Beneficiario.Cartao
+                    },
+                    Prestador = new IntPrestador {
+                        CodPrestador = guia.Prestador.Codigo,
+                        NomePrestador = prestador,
+                        Endereco = "123",
+                        Localizacao = new Localizacao()
+                    },
+                    CodAtendimento = "193"
+                };
+
+                var codigo = _PushService.Post(request);
+                
+                guia.PushId = codigo;
                 guia.TokenId = "";
 
-                guia.GuiaOrigemFK = (int)SourceInterface.TELEMEDICINA;
-                guia.StatusCheckInFK = (int)StatusCheckIns.Valido;
-                guia.GuiaTipoFK = (int)TypeGuia.Consulta;
-                guia.GuiaStatusFK = (int)StatusGuia.Aberta;
+                guia.GuiaOrigemFK = (int)Enums.SourceInterface.TELEMEDICINA;
+                guia.StatusCheckInFK = (int)Enums.StatusCheckIns.Valido;
+                guia.GuiaTipoFK = (int)Enums.TypeGuia.Consulta;
+                guia.GuiaStatusFK = (int)Enums.StatusGuia.Aberta;
 
                 string profissional = _PrestadorService.PrestadorMedico(guia.Prestador.Codigo, 
                     guiaDto.ProfissionalUFCRM,Convert.ToInt32(guiaDto.ProfissionalCRM), null);
                 
                 guia.GuiaXML = _GuiaService.GenerateXMLGuia(guia, prestador,
-                    PerformerCodeType.codigoPrestadorNaOperadora, guiaDto.ProfissionalUFCRM, 
+                    guidePerformerCodeType, guiaDto.ProfissionalUFCRM, 
                     Convert.ToInt32(guiaDto.ProfissionalCRM), profissional, guiaDto.Procedimento);
                 string textGuia = guia.GuiaXML.ToString();
 

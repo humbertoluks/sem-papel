@@ -3,10 +3,10 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using Domain.Enumerations;
 
 //using Domain.Enumerations;
 using Domain.Models;
+using Domain.Helpers;
 using Service.Interfaces;
 
 namespace Service
@@ -42,7 +42,7 @@ namespace Service
 
         return content;
     }
-    public string GenerateXMLGuia(Guia guia, string prestador, PerformerCodeType performerCodeType, 
+    public string GenerateXMLGuia(Guia guia, string prestador, Enums.PerformerCodeType performerCodeType, 
         string proficionalUFCRM, int profissionalCRM, string profissional, string procedimento)
     {
       var guiaXML = new guiaAtendimentoObj
@@ -65,7 +65,7 @@ namespace Service
         guidePerformerCodeType = performerCodeType.ToString(),
         guidePerformerCNES = "999999",
         
-        guideObservation = "Guia gerada no Telemedicina, com token aprovado",
+        guideObservation = Consts.GuideObservation,
         guideQueryType = "1",
         guideIndicationCrahs = "9",
         guideTableNumber = "00",

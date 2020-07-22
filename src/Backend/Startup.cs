@@ -12,7 +12,7 @@ using System.Text;
 
 using Backend.Filters;
 using DI;
-
+using Domain.Models;
 
 namespace Backend
 {
@@ -25,6 +25,9 @@ namespace Backend
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
+            var section = Configuration.GetSection("WebApiConfiguration");
+            services.Configure<WebApiConfiguration>(section);
+
             Bootstraper.Configure(services, Configuration);
 
             services.AddCors();

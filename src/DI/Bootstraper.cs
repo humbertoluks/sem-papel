@@ -26,6 +26,8 @@ namespace DI
             services.AddTransient(typeof(IGuiaService), typeof(GuiaService));
             services.AddTransient(typeof(IAssociadoService), typeof(AssociadoService));
             services.AddTransient(typeof(IPrestadorService), typeof(PrestadorService));
+
+            services.AddTransient(typeof(IPushService), typeof(PushService));
         }
     }
 }
