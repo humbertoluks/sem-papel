@@ -1,14 +1,23 @@
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System.Linq;
 
+using Domain.Arguments;
+using Domain.Models;
 using Service.Interfaces;
 
 namespace Service
 {
     public class PrestadorService: IPrestadorService
     {
-        private static RestClient client = new RestClient("http://omtseg-homolog.omintseguros.com.br/MW.WebApi.Ext");
-        public PrestadorService(){ }
+        public readonly WebApiConfiguration _config;
+        private static RestClient client;
+        public PrestadorService(IOptions<WebApiConfiguration> options)
+        {
+            _config = options.Value;
+            client = new RestClient(_config.MWWebApi);
+        }
         private string login()
         {
             RestRequest login = new RestRequest("/oauth/token", Method.POST);
@@ -39,7 +48,7 @@ namespace Service
             return (string)prestadorObj["prestadorNome"];
         }
 
-        public string PrestadorMedico(string codigoPrestador, string ufCrm, int nrCrm, string nomeMedico)
+        public MedicoResponse PrestadorMedico(string codigoPrestador, string ufCrm, int nrCrm, string nomeMedico)
         {
             var token = login();
             RestRequest request = new RestRequest($"/ContratoPrestador/GetPrestadorMedicos", Method.GET);
@@ -54,13 +63,12 @@ namespace Service
             request.AddParameter("nomeMedico", nomeMedico, ParameterType.QueryString);
 
             IRestResponse<string> response = client.Execute<string>(request);
-            if(response.StatusCode != System.Net.HttpStatusCode.OK) return "";
             
-            var medicos = JArray.Parse(response.Content);
-            var medico = medicos.First;
-            //var medico = JsonConvert.DeserializeObject<Medico>(response.Content);
+            if(response.StatusCode != System.Net.HttpStatusCode.OK || response.Content == "null") return null;
 
-            return (string)medicos.First["medicoNome"];
+            var medicos = JArray.Parse(response.Content);
+            
+            return medicos.FirstOrDefault()?.ToObject<MedicoResponse>();
         }
     }
 }

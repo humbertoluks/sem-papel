@@ -1,9 +1,9 @@
-using Domain.Dtos.Push;
+using Domain.Arguments;
 
 namespace Service.Interfaces
 {
   public interface IPushService
   {
-      string Post(PushRequest pushRequest);
+      string GetPushCode(IPushRequest pushRequest);
   }
 }

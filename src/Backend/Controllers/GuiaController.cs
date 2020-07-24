@@ -7,13 +7,12 @@ using Serilog;
 using System;
 using System.Threading.Tasks;
 
+using Domain.Arguments;
 using Domain.Dtos;
 using Domain.Models;
 using Domain.Helpers;
 using Repository.Interfaces;
 using Service.Interfaces;
-using Domain.Dtos.Push;
-using Domain.ValueObjects;
 
 namespace Backend.Controllers
 {
@@ -27,18 +26,22 @@ namespace Backend.Controllers
         private readonly IGuiaNumeroRepository _GuiaNumeroRepository;
         private readonly IGuiaService _GuiaService;
         private readonly IPrestadorService _PrestadorService;
-        private readonly IAssociadoService _AssociadoService ;
+        private readonly IBeneficiarioService _BeneficiarioService ;
         private readonly IPushService _PushService;
+        private readonly ITokenService _TokenService;
         private readonly IUnitOfWork _uow;
+        private readonly IPushRequest _PushRequest;
 
         public GuiaController(ILogger<GuiaController> logger, IDiagnosticContext diagnosticContext, 
-            [FromServices] IGuiaRepository GuiaRepository, 
-            [FromServices] IGuiaNumeroRepository GuiaNumeroRepository,
-            [FromServices] IGuiaService GuiaService,
-            [FromServices] IPrestadorService PrestadorService,
-            [FromServices] IAssociadoService AssociadoService,
-            [FromServices] IPushService PushService,
-            [FromServices] IUnitOfWork uow,
+            IGuiaRepository GuiaRepository, 
+            IGuiaNumeroRepository GuiaNumeroRepository,
+            IGuiaService GuiaService,
+            IPrestadorService PrestadorService,
+            IBeneficiarioService AssociadoService,
+            IPushService PushService,
+            ITokenService TokenService,
+            IUnitOfWork uow,
+            IPushRequest pushRequest,
             IMapper mapper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -47,10 +50,12 @@ namespace Backend.Controllers
             _GuiaNumeroRepository =GuiaNumeroRepository;
             _GuiaService = GuiaService;
             _PrestadorService = PrestadorService;
-            _AssociadoService = AssociadoService;
+            _BeneficiarioService = AssociadoService;
             _PushService = PushService;
+            _TokenService = TokenService;
             _uow = uow;
             _mapper = mapper;
+            _PushRequest = pushRequest;
         }
 
         [HttpPost]
@@ -61,45 +66,41 @@ namespace Backend.Controllers
             try
             {
                 var guia = _mapper.Map<GuiaDto, Guia>(guiaDto);
-                var prestador = _PrestadorService.PrestadorDescription(guia.Prestador.Codigo);
                 var guidePerformerCodeType = Enums.PerformerCodeType.codigoPrestadorNaOperadora;
                 // Complemento da Guia
                 var guiaNumero = await _GuiaNumeroRepository.GetLastGuiaIdAsync(guia.Prestador.Codigo);
                 guia.GuiaNumero.Numero = guiaNumero.ToString();
                 guia.GuiaNumero.NumeroOperadora = "";
  
-                guia.Beneficiario.Nome = _AssociadoService.SeachAssociado(guia.Beneficiario.Cartao);
+                BeneficiarioResponse beneficiario = _BeneficiarioService.SeachBeneficiario(guia.Beneficiario.Cartao);
+                guia.Beneficiario.Nome = beneficiario.guideBeneficiaryName;
 
-                PushRequest request = new PushRequest {
-                    Associado = new IntAssociado {
-                        CodAcompanhante = "",
-                        CodAssociado = guia.Beneficiario.Cartao
-                    },
-                    Prestador = new IntPrestador {
-                        CodPrestador = guia.Prestador.Codigo,
-                        NomePrestador = prestador,
-                        Endereco = "123",
-                        Localizacao = new Localizacao()
-                    },
-                    CodAtendimento = "193"
-                };
-
-                var codigo = _PushService.Post(request);
+                _PushRequest.CodAtendimento = "123"; 
+                _PushRequest.Associado.CodAcompanhante = "";
+                _PushRequest.Associado.CodAssociado = guia.Beneficiario.Cartao;
                 
-                guia.PushId = codigo;
-                guia.TokenId = "";
+                var prestador = _PrestadorService.PrestadorDescription(guia.Prestador.Codigo);
+                
+                _PushRequest.Prestador.CodPrestador = guia.Prestador.Codigo;
+                _PushRequest.Prestador.Endereco = "193";
+                _PushRequest.Prestador.Localizacao.Latitude  = "";
+                _PushRequest.Prestador.Localizacao.Longitude = "";
+                _PushRequest.Prestador.NomePrestador   = prestador;
 
-                guia.GuiaOrigemFK = (int)Enums.SourceInterface.TELEMEDICINA;
+                guia.PushId  = _PushService.GetPushCode(_PushRequest);
+                guia.TokenId = _TokenService.GetTokenCode(_PushRequest.Associado.CodAssociado);
+
+                guia.GuiaOrigemFK    = (int)Enums.SourceInterface.Telemedicina;
                 guia.StatusCheckInFK = (int)Enums.StatusCheckIns.Valido;
-                guia.GuiaTipoFK = (int)Enums.TypeGuia.Consulta;
-                guia.GuiaStatusFK = (int)Enums.StatusGuia.Aberta;
+                guia.GuiaTipoFK      = (int)Enums.TypeGuia.Consulta;
+                guia.GuiaStatusFK    = (int)Enums.StatusGuia.Aberta;
 
-                string profissional = _PrestadorService.PrestadorMedico(guia.Prestador.Codigo, 
+                MedicoResponse profissional = _PrestadorService.PrestadorMedico(guia.Prestador.Codigo, 
                     guiaDto.ProfissionalUFCRM,Convert.ToInt32(guiaDto.ProfissionalCRM), null);
+
+                guia.GuiaXML = _GuiaService.GenerateXMLGuia(guia, guidePerformerCodeType, 
+                    prestador, beneficiario, profissional, guiaDto.Procedimento);
                 
-                guia.GuiaXML = _GuiaService.GenerateXMLGuia(guia, prestador,
-                    guidePerformerCodeType, guiaDto.ProfissionalUFCRM, 
-                    Convert.ToInt32(guiaDto.ProfissionalCRM), profissional, guiaDto.Procedimento);
                 string textGuia = guia.GuiaXML.ToString();
 
                 _logger.LogInformation(textGuia);
@@ -107,6 +108,7 @@ namespace Backend.Controllers
                 _GuiaRepository.Save(guia);
                 await _uow.CommitAsync();
  
+
                 return Created($"/v1/guia/{guia.Id}", null);
             }
             catch (System.Exception ex)
@@ -121,6 +123,7 @@ namespace Backend.Controllers
         [Route("v1/guia/{GuiaExternaId:int}")]
         [Authorize]
         public async Task<IActionResult> Delete(decimal id){
+  
             try
             {
                 _GuiaRepository.Delete(id);

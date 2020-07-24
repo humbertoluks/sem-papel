@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-//using Domain.Enumerations;
+using Domain.Arguments;
 using Domain.Models;
 using Domain.Helpers;
 using Service.Interfaces;
@@ -13,9 +13,9 @@ namespace Service
 {
   public class GuiaService : IGuiaService
   {
-    private readonly IAssociadoService _AssociadoService;
+    private readonly IBeneficiarioService _AssociadoService;
     private readonly IPrestadorService _PrestadorService;
-    public GuiaService(IAssociadoService AssociadoService, IPrestadorService PrestadorService)
+    public GuiaService(IBeneficiarioService AssociadoService, IPrestadorService PrestadorService)
     {
       this._AssociadoService = AssociadoService;
       this._PrestadorService = PrestadorService;
@@ -42,19 +42,17 @@ namespace Service
 
         return content;
     }
-    public string GenerateXMLGuia(Guia guia, string prestador, Enums.PerformerCodeType performerCodeType, 
-        string proficionalUFCRM, int profissionalCRM, string profissional, string procedimento)
+    public string GenerateXMLGuia(Guia guia, Enums.PerformerCodeType performerCodeType, string prestador,  
+         BeneficiarioResponse beneficiario, MedicoResponse profissional, string procedimento)
     {
       var guiaXML = new guiaAtendimentoObj
       {
-        guideANS = "359661",
-
+        guideANS = Consts.CodeANSOmint,
         guideTypeId = guia.GuiaTipoFK,
         guideStatusId = guia.GuiaStatusFK,
         guideOrgimId = guia.GuiaOrigemFK,
-        guideCheckingStatus = guia.StatusCheckInFK,
-
-        guideId = 0,
+        
+        guideId = 0, 
         guideDayCare = guia.Data.ToString("dd/MM/yyyy"),
         
         providerId = guia.Prestador.Codigo,
@@ -63,33 +61,36 @@ namespace Service
         guidePerformerName = prestador,
         guidePerformerCode = guia.Prestador.Codigo,
         guidePerformerCodeType = performerCodeType.ToString(),
-        guidePerformerCNES = "999999",
+        guidePerformerCNES = Consts.CodeCNESConsulta,
         
-        guideObservation = Consts.GuideObservation,
         guideQueryType = "1",
         guideIndicationCrahs = "9",
         guideTableNumber = "00",
+        guideObservation = string.Format(Consts.GuideObservation,guia.PushId, guia.TokenId),
 
-        guideToken = "", // GERAR PUSH
-        guideBeneficiaryToken = "", // GERAR TOKEN
-        
+        guideToken = guia.PushId,
+        guideBeneficiaryToken = guia.TokenId,
+        guideCheckingStatus = guia.StatusCheckInFK,
+
         guideNumber = guia.GuiaNumero.Numero,
         guideNumberHealth = guia.GuiaNumero.NumeroOperadora,
 
-        guideBeneficiaryRN = "N",
-        guideBeneficiaryName = guia.Beneficiario.Nome,
+        guideBeneficiaryRN     = "N",
+        guideBeneficiaryName   = guia.Beneficiario.Nome,
         guideBeneficiaryNumber = guia.Beneficiario.Cartao,
         guideBeneficiaryNumberCompanion = "0",
-        guideBeneficiaryCompanionRG = "",
-        guideBeneficiaryCompanionName = "",
-        guideBeneficiaryCompanionType = "",
-
-        guidePerformerProfName = profissional,
-        guidePerformerProfCode = "14762405825",
-        guidePerformerProfAdviceUF = "35",
-        guidePerformerProfAdviceCBOS = "999999",
-        guidePerformerProfAdviceNumber = "87157",
-        guidePerformerProfAdviceAcronym = "6",
+        guideBeneficiaryCompanionRG     = beneficiario?.guideBeneficiaryCompanionRG,
+        guideBeneficiaryCompanionName   = "",
+        guideBeneficiaryCompanionType   = "",
+        
+        guidePerformerProfRede = true,
+        
+        guidePerformerProfName     = profissional?.medicoNome,
+        guidePerformerProfCode     = profissional?.medicoCpfCnpj.Trim(),
+        guidePerformerProfAdviceUF = profissional?.medicoCRMUF,
+        guidePerformerProfAdviceCBOS    = profissional != null ? Consts.CodeCBOSConsulta: null,
+        guidePerformerProfAdviceNumber  = profissional?.medicoCRM.Trim(),
+        guidePerformerProfAdviceAcronym = profissional != null ? ((int)(Enums.AdviceType)System.Enum.Parse(typeof(Enums.AdviceType), "CRM")).ToString(): null,
 
         guideProcedureOk = 1,
         guideProcedureNumber = procedimento,
@@ -104,10 +105,11 @@ namespace Service
                 priceTotal = guia.Valor
             }
         },
+
         guidePriceProcedure = guia.Valor,
         guidePriceGrandTotal = guia.Valor,
-        guideBlocked = false,
-        guidePerformerProfRede = true
+        
+        guideBlocked = false
       };
 
       return ToString(guiaXML, typeof(guiaAtendimentoObj), Encoding.UTF8);

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
+using Domain.Arguments;
 using Repository;
 using Repository.Interfaces;
 using Repository.Data;
@@ -24,10 +25,13 @@ namespace DI
             services.AddTransient(typeof(IGuiaNumeroRepository), typeof(GuiaNumeroRepository));
 
             services.AddTransient(typeof(IGuiaService), typeof(GuiaService));
-            services.AddTransient(typeof(IAssociadoService), typeof(AssociadoService));
+            services.AddTransient(typeof(IBeneficiarioService), typeof(AssociadoService));
             services.AddTransient(typeof(IPrestadorService), typeof(PrestadorService));
 
             services.AddTransient(typeof(IPushService), typeof(PushService));
+            services.AddTransient(typeof(ITokenService), typeof(TokenService));
+
+            services.AddTransient(typeof(IPushRequest), typeof(PushRequest));
         }
     }
 }

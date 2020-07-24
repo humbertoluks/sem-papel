@@ -2,7 +2,7 @@ Arguments:
   C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js publish
 
 PATH: 
-  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\Git\cmd;C:\ProgramData\nvm;C:\Program Files\nodejs;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Azure Data Studio\bin;C:\Program Files (x86)\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\luksd\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Oracle\VirtualBox;C:\Users\luksd\AppData\Local\Yarn\bin;C:\Program Files\Azure Data Studio\bin;C:\Users\luksd\.dotnet\tools
+  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\Git\cmd;C:\ProgramData\nvm;C:\Program Files\nodejs;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Azure Data Studio\bin;C:\Program Files (x86)\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\luksd\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Oracle\VirtualBox;C:\Users\luksd\AppData\Local\Yarn\bin;C:\Program Files\Azure Data Studio\bin;C:\Users\luksd\.dotnet\tools;C:\Users\luksd\.dotnet\tools
 
 Yarn version: 
   1.22.4
@@ -35,7 +35,7 @@ npm manifest:
     "license": "MIT",
     "scripts": {
       "start": "dotnet run -p ./src/Backend/Backend.csproj",
-      "publish": "dotnet publish -p ./src/Backend/Backend.csproj -o D:/temp/publish/Sem-Papel/Backend",
+      "publish-project": "cd ./src/Backend/ && dotnet publish -o D:/temp/publish/Sem-Papel/Backend",
       "watch": "dotnet watch -p ./src/Backend/Backend.csproj run",
       "migration": "cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations add ",
       "remove-migration":"cd ./src/Repository/ && dotnet ef --startup-project ../Backend/Backend.csproj migrations remove",

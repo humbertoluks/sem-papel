@@ -26,14 +26,34 @@ namespace Domain.Helpers
         public enum SourceInterface
         {
             URL,
-            PORTAL,
-            TELEMEDICINA
+            Portal,
+            Telemedicina
         }
         public enum PerformerCodeType
         {
             CNPJ,
             cpf,
             codigoPrestadorNaOperadora
+        }
+        public enum AdviceType{
+            CRAS = 1,
+            COREN,
+            CRF,
+            CRFA,
+            CREFITO,
+            CRM,
+            CRN,
+            CRO,
+            CRP,
+            OUTROS
+        }
+        public enum DegreeKinship{
+            AvoAvo,
+            TioTia,
+            IrmaoIrma,
+            PrimoPrima,
+            PadrastoMadrasta,
+            Baba
         }
     }
 }

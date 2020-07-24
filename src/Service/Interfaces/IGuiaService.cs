@@ -1,11 +1,12 @@
-using Domain.Models;
+using Domain.Arguments;
 using Domain.Helpers;
+using Domain.Models;
 
 namespace Service.Interfaces
 {
     public interface IGuiaService
     {
-         string GenerateXMLGuia(Guia guia, string prestador, Enums.PerformerCodeType performerCodeType, 
-        string proficionalUFCRM, int profissionalCRM, string profissional, string procedimento);
+         string GenerateXMLGuia(Guia guia, Enums.PerformerCodeType performerCodeType, string prestador,  
+            BeneficiarioResponse beneficiario, MedicoResponse profissional, string procedimento);
     }
 }
